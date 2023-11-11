@@ -87,6 +87,11 @@ def generate_chat(name, members, admin_id, session: Session):
     session.commit()
 
 
+def get_user_by_id(user_id, db_sess: Session):
+    user = db_sess.query(User).where(User.id == user_id).first()
+    return user
+
+
 def get_messages_in_chat(chat_id, db_sess: Session):
     result = db_sess.execute(sql_text(f"SELECT * FROM chat_{chat_id}")).all()
     return result
