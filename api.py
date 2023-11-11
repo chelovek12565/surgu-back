@@ -9,7 +9,7 @@ app = Flask(__name__)
 from socket_func import socketio
 socketio.init_app(app)
 
-db_session.global_init("./data/main.db")
+db_session.global_init()
 
 
 @app.route("/new_message", methods=["POST"])
