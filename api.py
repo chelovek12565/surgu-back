@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from data import db_session
 from data.__all_models import *
 from data.db_func import *
@@ -27,6 +27,35 @@ def invite():
         socketio.emit("invite", {"who": get_username_by_id(mem_id, db_sess), "by": by_username},
              to=str(request.json["chat_id"]))
     return "ok"
+
+
+@app.route("/chat/<chat_id>")
+def chat_messages(chat_id):
+    db_sess = db_session.create_session()
+    messages = get_messages_in_chat(chat_id, db_sess)
+    out = [list(row) for row in messages]
+    return jsonify(out)
+
+
+@app.route("/last_messages", methods=["GET"])
+def last_messages():
+    """
+    index - отсчет с нуля
+    chat_id
+
+    вывод:
+    [
+        [id, text, user_id, datetime]
+    ]
+    """
+    db_sess = db_session.create_session()
+
+    index = request.json["index"]
+    chat_id = request.json["chat_id"]
+    messages = list(reversed(get_messages_in_chat(chat_id, db_sess)))
+    out = [list(row) for row in messages[index * 100: (index + 1) * 100 - 1]]
+    # print(out)
+    return jsonify(out)
 
 
 @app.route("/new_message", methods=["POST"])
@@ -58,7 +87,8 @@ def auth():
 @app.route("/new_chat", methods=["POST"])
 def add_chat():
     name, members, admin_id = request.json["name"], request.json["members"], request.json["admin_id"]
-    members.append(admin_id)
+    if admin_id not in members:
+        members.append(admin_id)
     db_sess = db_session.create_session()
     generate_chat(name, members, admin_id, db_sess)
     return "ok"

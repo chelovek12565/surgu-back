@@ -87,8 +87,12 @@ def generate_chat(name, members, admin_id, session: Session):
     session.commit()
 
 
+def get_messages_in_chat(chat_id, db_sess: Session):
+    result = db_sess.execute(sql_text(f"SELECT * FROM chat_{chat_id}")).all()
+    return result
+
+
 def new_message(chat_id, text, user_id, db_sess: Session):
-    meta = MetaData()
     # print(meta.tables.keys())
     # table = meta.tables[f"chat_{chat_id}"]
     # sql_insert = table.insert(
@@ -96,6 +100,9 @@ def new_message(chat_id, text, user_id, db_sess: Session):
         # text = text,
         # datetime=datetime.datetime.now()
     # )
+    members = db_sess.query(ChatInfo).where(ChatInfo.id == chat_id).first().members.split()
+    if user_id not in members:
+        raise Exception("Участник не состоит в чате")
 
     sql_insert = f'INSERT INTO chat_{chat_id} (user_id, text, datetime) VALUES ({user_id}, "{text}", "{datetime.datetime.now()}")'
 
