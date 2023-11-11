@@ -92,6 +92,11 @@ def get_user_by_id(user_id, db_sess: Session):
     return user
 
 
+def get_user_by_token(token, db_sess: Session):
+    user = db_sess.query(User).where(User.token == token).first()
+    return user
+
+
 def get_messages_in_chat(chat_id, db_sess: Session):
     result = db_sess.execute(sql_text(f"SELECT * FROM chat_{chat_id}")).all()
     return result

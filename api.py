@@ -29,6 +29,12 @@ def invite():
     return "ok"
 
 
+@app.route("/user/by_token/<token>")
+def api_user_by_token(token):
+    db_sess = db_session.create_session()
+    return jsonify(get_user_by_token(token, db_sess).to_dict())
+
+
 @app.route("/user/by_id/<user_id>")
 def api_user_by_id(user_id):
     db_sess = db_session.create_session()
