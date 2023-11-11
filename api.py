@@ -2,9 +2,11 @@ from flask import Flask, request
 from data import db_session
 from data.__all_models import *
 from data.db_func import *
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+CORS(app)
 
 from socket_func import socketio
 socketio.init_app(app)
