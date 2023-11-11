@@ -5,6 +5,8 @@ from flask import request
 
 
 socketio = SocketIO()
+
+
 @socketio.on("connect")
 def connect():
     print("Connected")

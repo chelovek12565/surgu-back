@@ -9,7 +9,7 @@ app = Flask(__name__)
 from socket_func import socketio
 socketio.init_app(app)
 
-db_session.global_init()
+db_session.global_init("./data/main.db")
 
 
 @app.route("/new_message", methods=["POST"])
@@ -28,7 +28,7 @@ def main():
 @app.route("/add_user", methods=["POST"])
 def add_user():
     db_sess = db_session.create_session()
-    new_user(db_sess, request.json)
+    new_user(db_sess, **request.json)
     db_sess.commit()
     return "ok"
 

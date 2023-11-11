@@ -1,9 +1,6 @@
 import sqlalchemy
-from sqlalchemy.orm import Session
 from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
-from sqlalchemy.schema import CreateTable
-
 
 
 class ChatInfo(SqlAlchemyBase, SerializerMixin):
