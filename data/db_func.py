@@ -14,17 +14,30 @@ def new_user(db_sess: Session, username, token):
     db_sess.add(user)
 
 
-def create_session(db_sess: Session, sid, chat_id, username):
+def get_sid_by_chat(chat_id, db_sess: Session):
+    sids = list(map(lambda x: x.sid,
+                db_sess.query(SocketSession).filter(SocketSession.chat_id == chat_id).all()))
+    return sids
+
+
+def get_username_by_id(user_id, db_sess: Session):
+    username = db_sess.query(User).filter(User.id == user_id).first().username
+    return username
+
+
+def create_session(db_sess: Session, sid, chat_id, token):
     session = SocketSession()
     session.sid = sid
     session.chat_id = chat_id
     session.token = token
     db_sess.add(session)
+    db_sess.commit()
 
 
 def delete_session(db_sess: Session, sid):
-    session = db_sess.query(SocketSession).filter(SocketSession.sid == sid)
+    session = db_sess.query(SocketSession).filter(SocketSession.sid == sid).first()
     db_sess.delete(session)
+    db_sess.commit()
 
 
 def generate_chat(name, members, admin_id, session: Session):

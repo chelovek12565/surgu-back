@@ -12,9 +12,17 @@ socketio.init_app(app)
 db_session.global_init("./data/main.db")
 
 
-# @app.route("/")
-# def main():
-    # return "ok"
+@app.route("/new_message", methods=["POST"])
+def main():
+    '''
+    json.keys: chat_id, text, user_id
+    '''
+    db_sess = db_session.create_session()
+    new_message(
+        db_sess=db_sess,
+        **request.json
+    )
+    return "ok"
 
 
 @app.route("/add_user", methods=["POST"])
@@ -25,8 +33,8 @@ def add_user():
     return "ok"
 
 
-@app.route("/test", methods=["POST"])
-def test():
+@app.route("/new_chat", methods=["POST"])
+def add_chat():
     name, members, admin_id = request.json["name"], request.json["members"], request.json["admin_id"]
     members.append(admin_id)
     db_sess = db_session.create_session()
