@@ -27,6 +27,10 @@ def main():
 
 @app.route("/add_user", methods=["POST"])
 def add_user():
+    '''
+    username, token
+    :return:
+    '''
     db_sess = db_session.create_session()
     new_user(db_sess, **request.json)
     db_sess.commit()
@@ -43,4 +47,4 @@ def add_chat():
 
 
 # app.run(port=123)
-socketio.run(app, port=5000)
+socketio.run(app, port=5000, allow_unsafe_werkzeug=True)
