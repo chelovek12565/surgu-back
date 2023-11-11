@@ -7,4 +7,4 @@ class SocketSession(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'sessions'
     sid = sqlalchemy.Column(sqlalchemy.Integer, unique=True, primary_key=True)
     chat_id = sqlalchemy.Column(sqlalchemy.Integer)
-    username = sqlalchemy.Column(sqlalchemy.String)
+    token = sqlalchemy.Column(sqlalchemy.String)

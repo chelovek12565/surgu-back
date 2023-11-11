@@ -1,3 +1,8 @@
 venv
 __pycache__/
 data/__pycache__/
+data/main.db
+__pycache__/socket_func.cpython-310.pyc
+.gitignore
+data/__pycache__/db_func.cpython-310.pyc
+.gitignore

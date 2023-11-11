@@ -25,5 +25,14 @@ def add_user():
     return "ok"
 
 
+@app.route("/test", methods=["POST"])
+def test():
+    name, members, admin_id = request.json["name"], request.json["members"], request.json["admin_id"]
+    members.append(admin_id)
+    db_sess = db_session.create_session()
+    generate_chat(name, members, admin_id, db_sess)
+    return "ok"
+
+
 # app.run(port=123)
 socketio.run(app, port=5000)
