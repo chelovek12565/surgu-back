@@ -3,6 +3,7 @@ from data import db_session
 from data.__all_models import *
 from data.db_func import *
 from flask_cors import CORS, cross_origin
+from flask_socketio import emit
 
 app = Flask(__name__)
 CORS(app)
@@ -12,6 +13,20 @@ from socket_func import socketio
 socketio.init_app(app, cors_allowed_origins="*")
 
 db_session.global_init("./data/main.db")
+
+
+@app.route("/invite", methods=["POST"])
+def invite():
+    """
+    members_id, chat_id, by
+    """
+    db_sess = db_session.create_session()
+    add_chat_members(db_sess, request.json["members_id"], request.json["chat_id"])
+    by_username = get_username_by_id(request.json["by"], db_sess)
+    for mem_id in request.json["members_id"]:
+        socketio.emit("invite", {"who": get_username_by_id(mem_id, db_sess), "by": by_username},
+             to=str(request.json["chat_id"]))
+    return "ok"
 
 
 @app.route("/new_message", methods=["POST"])

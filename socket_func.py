@@ -27,6 +27,7 @@ def user_connect(token, chat_id):
 
 @socketio.on("disconnect")
 def user_disconnect():
+    print(request.sid)
     db_sess = db_session.create_session()
     session = db_sess.query(SocketSession).filter(SocketSession.sid == request.sid).first()
     leave_room(str(session.chat_id))
@@ -44,10 +45,10 @@ def new_message(chat_id, text, user_id):
         text=text,
         user_id=user_id
     )
-    sids = get_sid_by_chat(chat_id, db_sess)
+    # sids = get_sid_by_chat(chat_id, db_sess)
     # del sids[sids.index(request.sid)]
-    for sid in sids:
-        emit("chat", {"text": text, "username": get_username_by_id(user_id, db_sess=db_sess)}, to=str(chat_id))
+    # for sid in sids:
+    emit("chat", {"text": text, "username": get_username_by_id(user_id, db_sess=db_sess)}, to=str(chat_id))
 
 
 

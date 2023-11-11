@@ -52,6 +52,16 @@ def delete_session(db_sess: Session, sid):
     db_sess.commit()
 
 
+def add_chat_members(db_sess: Session, members_id, chat_id):
+    chat = db_sess.query(ChatInfo).where(ChatInfo.id == chat_id).first()
+    members = chat.members.split()
+    for mem_id in members_id:
+        if str(mem_id) not in members:
+            members.append(str(mem_id))
+    chat.members = " ".join(sorted(members))
+    db_sess.commit()
+
+
 def generate_chat(name, members, admin_id, session: Session):
 
     chat_info = ChatInfo()
@@ -79,7 +89,7 @@ def generate_chat(name, members, admin_id, session: Session):
 
 def new_message(chat_id, text, user_id, db_sess: Session):
     meta = MetaData()
-    print(meta.tables.keys())
+    # print(meta.tables.keys())
     # table = meta.tables[f"chat_{chat_id}"]
     # sql_insert = table.insert(
         # user_id = user_id,
