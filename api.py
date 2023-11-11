@@ -2,14 +2,14 @@ from flask import Flask, request
 from data import db_session
 from data.__all_models import *
 from data.db_func import *
-from flask_cors import CORS
-
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 from socket_func import socketio
-socketio.init_app(app)
+socketio.init_app(app, cors_allowed_origins="*")
 
 db_session.global_init("./data/main.db")
 
