@@ -11,7 +11,7 @@ class User(SqlAlchemyBase, SerializerMixin):
     password = sqlalchemy.Column(sqlalchemy.String)
 
 class WeekUser(SqlAlchemyBase, SerializerMixin):
-    __tablename__ = 'users'
+    __tablename__ = 'users_token'
     id = sqlalchemy.Column(sqlalchemy.Integer, unique=True, autoincrement=True, primary_key=True)
     username = sqlalchemy.Column(sqlalchemy.String)
     email = sqlalchemy.Column(sqlalchemy.String)

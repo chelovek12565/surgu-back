@@ -1,3 +1,4 @@
+from data.users import WeekUser
 from .__all_models import *
 from sqlalchemy.orm import Session
 
@@ -9,6 +10,15 @@ def new_user(db_sess: Session, data):
     user.email = data['email']
     user.password = data['password']
     db_sess.add(user)
+
+def new_user(db_sess: Session, data):
+    user = WeekUser()
+    user.id = data.id
+    user.email = data['email']
+    user.password = data['password']
+    db_sess.add(user)
+
+
 
 
 def create_session(db_sess: Session, sid, chat_id, username):

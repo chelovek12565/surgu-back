@@ -25,5 +25,13 @@ def add_user():
     return "ok"
 
 
+@app.route("/auth", methods=["POST"])
+def add_user():
+    db_sess = db_session.create_session()
+    new_user(db_sess, request.json)
+    db_sess.commit()
+    return "ok"
+
+
 # app.run(port=123)
 socketio.run(app, port=5000)
