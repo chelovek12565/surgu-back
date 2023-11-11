@@ -5,12 +5,24 @@ from sqlalchemy.schema import CreateTable, DropTable, MetaData, Table
 from sqlalchemy import Column
 from sqlalchemy import String, Integer, Float, BigInteger, DateTime
 import datetime
+import requests
 
 
-def new_user(db_sess: Session, username, token):
+def new_user(db_sess: Session, token):
     user = User()
-    user.username = username
+    r = requests.get("https://api.weeek.net/public/v1/user/me",
+                     headers={
+                         'Authorization': 'Bearer ' + token
+                     })
+
+    result = r.json()
+    if result["success"] == "false":
+        raise Exception("Аутентификация не пройдена")
     user.token = token
+    name = [result['user']['firstName'], result['user']['lastName']]
+    name = filter(lambda x: bool(x), name)
+
+    user.username = " ".join(name)
     db_sess.add(user)
 
 

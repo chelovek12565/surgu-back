@@ -25,14 +25,15 @@ def main():
     return "ok"
 
 
-@app.route("/add_user", methods=["POST"])
-def add_user():
+@app.route("/auth", methods=["POST"])
+def auth():
     '''
-    username, token
-    :return:
+    token
     '''
     db_sess = db_session.create_session()
-    new_user(db_sess, **request.json)
+    user = db_sess.query(User).filter(User.token == request.json["token"]).first()
+    if not user:
+        new_user(db_sess, **request.json)
     db_sess.commit()
     return "ok"
 
