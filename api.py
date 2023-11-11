@@ -29,19 +29,29 @@ def invite():
     return "ok"
 
 
-@app.route("/user/by_token/<token>")
+@app.route("/delete_from_chat", methods=["DELETE"])
+def api_delete_from_chat():
+    db_sess = db_session.create_session()
+    chat_id = request.json["chat_id"]
+    member_id = request.json["member_id"]
+    delete_from_chat(chat_id, member_id, db_sess)
+    ch
+    socketio.emit("leaved_chat", {"user_id": member_id})
+
+
+@app.route("/user/by_token/<token>", methods=["GET"])
 def api_user_by_token(token):
     db_sess = db_session.create_session()
     return jsonify(get_user_by_token(token, db_sess).to_dict())
 
 
-@app.route("/user/by_id/<user_id>")
+@app.route("/user/by_id/<user_id>", methods=["GET"])
 def api_user_by_id(user_id):
     db_sess = db_session.create_session()
     return jsonify(get_user_by_id(user_id, db_sess).to_dict())
 
 
-@app.route("/chat/<chat_id>")
+@app.route("/chat/<chat_id>", methods=["GET"])
 def chat_messages(chat_id):
     db_sess = db_session.create_session()
     messages = get_messages_in_chat(chat_id, db_sess)

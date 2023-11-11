@@ -102,6 +102,24 @@ def get_messages_in_chat(chat_id, db_sess: Session):
     return result
 
 
+def chat_user_delete_message(chat_id, member_id, db_sess: Session):
+    sql_insert = f"INSERT INTO chat_{chat_id} (user_id, text, datetime) VALUES " \
+                 f'(0, "{get_username_by_id(member_id, db_sess)} вышел из чата",' \
+                 f'{datetime.datetime.now()})'
+    db_sess.execute(sql_insert)
+    db_sess.commit()
+
+
+def delete_from_chat(chat_id, member_id, db_sess: Session):
+    chat_info = db_sess.query(ChatInfo).where(ChatInfo.id == chat_id).first()
+    if chat_info.admin_id == member_id:
+        raise Exception("Вы пытаетесь выгнать админа, то есть, скорее всего, самого себя")
+    members = chat_info.members.split()
+    del members[members.index(str(member_id))]
+    chat_info.members = members
+    db_sess.commit()
+
+
 def new_message(chat_id, text, user_id, db_sess: Session):
     # print(meta.tables.keys())
     # table = meta.tables[f"chat_{chat_id}"]
@@ -111,7 +129,7 @@ def new_message(chat_id, text, user_id, db_sess: Session):
         # datetime=datetime.datetime.now()
     # )
     members = db_sess.query(ChatInfo).where(ChatInfo.id == chat_id).first().members.split()
-    if user_id not in members:
+    if str(user_id) not in members:
         raise Exception("Участник не состоит в чате")
 
     sql_insert = f'INSERT INTO chat_{chat_id} (user_id, text, datetime) VALUES ({user_id}, "{text}", "{datetime.datetime.now()}")'
