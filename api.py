@@ -9,7 +9,7 @@ app = Flask(__name__)
 from socket_func import socketio
 socketio.init_app(app)
 
-db_session.global_init("./hc-app/data/main.db")
+db_session.global_init("./data/main.db")
 
 
 # @app.route("/")
@@ -25,5 +25,5 @@ def add_user():
     return "ok"
 
 
-# app.run()
-socketio.run(app)
+# app.run(port=123)
+socketio.run(app, port=5000)
