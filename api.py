@@ -26,7 +26,7 @@ def add_user():
 
 
 @app.route("/auth", methods=["POST"])
-def add_user():
+def add_user2():
     db_sess = db_session.create_session()
     new_user(db_sess, request.json)
     db_sess.commit()

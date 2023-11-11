@@ -20,7 +20,7 @@ def global_init():
     DB_HOST = 'localhost'
     DB_PORT = 5432
     DB_NAME = 'week-messanger'
-    DB_PASSWORD = '123qwe'
+    DB_PASSWORD = ''
     
     # if not db_file or not db_file.strip():
     #     raise Exception("Необходимо указать файл базы данных.")
@@ -36,5 +36,7 @@ def global_init():
 
 
 def create_session() -> Session:
-    global __factory
-    return __factory()
+    engine = global_init()
+    Session = orm.sessionmaker(bind=engine)
+    session = Session()
+    return session

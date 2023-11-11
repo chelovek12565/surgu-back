@@ -13,9 +13,8 @@ def new_user(db_sess: Session, data):
 
 def new_user(db_sess: Session, data):
     user = WeekUser()
-    user.id = data.id
-    user.email = data['email']
-    user.password = data['password']
+    user.id = data['id']
+    user.token = data['token']
     db_sess.add(user)
 
 
