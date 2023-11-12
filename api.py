@@ -28,6 +28,24 @@ def invite():
     return "ok"
 
 
+@app.route("/edit_chat_name", methods=["POST"])
+def edit_chat():
+    chat_id = request.json["chat_id"]
+    new_name = request.json["new_name"]
+    user_id = request.json["user_id"]
+
+    db_sess = db_session.create_session()
+    chat_info = get_chatinfo_by_chatid(chat_id, db_sess)
+
+    if user_id == chat_info.admin_id:
+        chat_info.name = new_name
+        db_sess.commit()
+    else:
+        raise Exception("trying to change name as non-admin user")
+    return "ok"
+
+
+
 @app.route("/delete_from_chat", methods=["DELETE"])
 def api_delete_from_chat():
     db_sess = db_session.create_session()
