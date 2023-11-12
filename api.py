@@ -3,7 +3,6 @@ from data import db_session
 from data.__all_models import *
 from data.db_func import *
 from flask_cors import CORS, cross_origin
-from flask_socketio import emit
 
 app = Flask(__name__)
 CORS(app)
@@ -35,20 +34,21 @@ def api_delete_from_chat():
     chat_id = request.json["chat_id"]
     member_id = request.json["member_id"]
     delete_from_chat(chat_id, member_id, db_sess)
-    ch
-    socketio.emit("leaved_chat", {"user_id": member_id})
+    chat_user_delete_message(chat_id, member_id, db_sess)
+    socketio.emit("leaved_chat", {"user_id": member_id}, to=str(chat_id))
+    return "ok"
 
 
 @app.route("/user/by_token/<token>", methods=["GET"])
 def api_user_by_token(token):
     db_sess = db_session.create_session()
-    return jsonify(get_user_by_token(token, db_sess).to_dict())
+    return jsonify(user_pretty(get_user_by_token(token, db_sess)))
 
 
 @app.route("/user/by_id/<user_id>", methods=["GET"])
 def api_user_by_id(user_id):
     db_sess = db_session.create_session()
-    return jsonify(get_user_by_id(user_id, db_sess).to_dict())
+    return jsonify(user_pretty(get_user_by_id(user_id, db_sess)))
 
 
 @app.route("/chat/<chat_id>", methods=["GET"])
@@ -57,6 +57,22 @@ def chat_messages(chat_id):
     messages = get_messages_in_chat(chat_id, db_sess)
     out = [list(row) for row in messages]
     return jsonify(out)
+
+
+@app.route("/chat_short/<chat_id>", methods=["GET"])
+def chat_short(chat_id):
+    db_sess = db_session.create_session()
+    last_message = get_last_message(chat_id, db_sess)
+    user_id = last_message[2]
+    user = get_user_by_id(user_id, db_sess)
+    chat_info = get_chatinfo_by_chatid(chat_id, db_sess)
+    return jsonify({
+        "latest_message": {
+            "username": user.username,
+            "text": last_message[1]
+        },
+        "name": chat_info.name
+    })
 
 
 @app.route("/last_messages", methods=["GET"])

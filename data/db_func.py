@@ -8,6 +8,13 @@ import datetime
 import requests
 
 
+def user_pretty(user: User):
+    out = user.to_dict()
+    chats = out["chats"]
+    out["chats"] = list(map(int, chats.split()))
+    return out
+
+
 def new_user(db_sess: Session, token):
     user = User()
     r = requests.get("https://api.weeek.net/public/v1/user/me",
@@ -22,6 +29,7 @@ def new_user(db_sess: Session, token):
     name = [result['user']['firstName'], result['user']['lastName']]
     name = filter(lambda x: bool(x), name)
 
+    user.chats = ""
     user.username = " ".join(name)
     db_sess.add(user)
 
@@ -59,18 +67,33 @@ def add_chat_members(db_sess: Session, members_id, chat_id):
         if str(mem_id) not in members:
             members.append(str(mem_id))
     chat.members = " ".join(sorted(members))
+
+    for member_id in members:
+        member_id = int(member_id)
+        user = get_user_by_id(member_id, db_sess)
+        user.chats = " ".join(user.chats.split() + str(chat_id))
+    db_sess.commit()
+
+
+def add_chat_to_user(db_sess: Session, user_id, chat_id):
+    user = get_user_by_id(user_id, db_sess)
+    user.chats = " ".join(user.chats.split() + [str(chat_id)])
     db_sess.commit()
 
 
 def generate_chat(name, members, admin_id, session: Session):
-
     chat_info = ChatInfo()
     chat_info.name = name
     chat_info.members = " ".join(map(str, members))
     chat_info.admin_id = admin_id
+
     session.add(chat_info)
     session.commit()
+
     chat_id = chat_info.id
+
+    for mem_id in members:
+        add_chat_to_user(session, mem_id, chat_id=chat_id)
 
     TABLE_SPEC = [
         ('text', String),
@@ -97,16 +120,37 @@ def get_user_by_token(token, db_sess: Session):
     return user
 
 
+def get_last_message(chat_id, db_sess: Session):
+    sql_insert = f"SELECT * FROM chat_{chat_id}"
+    result = db_sess.execute(sql_text(sql_insert)).all()
+    if not result:
+        return None
+    return list(result[-1])
+
+
 def get_messages_in_chat(chat_id, db_sess: Session):
     result = db_sess.execute(sql_text(f"SELECT * FROM chat_{chat_id}")).all()
     return result
 
 
+def get_chatinfo_by_chatid(chat_id, db_sess: Session):
+    chat_info = db_sess.query(ChatInfo).where(ChatInfo.id == chat_id).first()
+    return chat_info
+
+
 def chat_user_delete_message(chat_id, member_id, db_sess: Session):
     sql_insert = f"INSERT INTO chat_{chat_id} (user_id, text, datetime) VALUES " \
                  f'(0, "{get_username_by_id(member_id, db_sess)} вышел из чата",' \
-                 f'{datetime.datetime.now()})'
-    db_sess.execute(sql_insert)
+                 f'"{datetime.datetime.now()}")'
+    db_sess.execute(sql_text(sql_insert))
+    db_sess.commit()
+
+
+def chat_user_invite_message(chat_id, member_id, db_sess: Session):
+    sql_insert = f"INSERT INTO chat_{chat_id} (user_id, text, datetime) VALUES " \
+                 f'(0, "{get_username_by_id(member_id, db_sess)} присоединился к чату",' \
+                 f'"{datetime.datetime.now()}")'
+    db_sess.execute(sql_text(sql_insert))
     db_sess.commit()
 
 
@@ -116,7 +160,7 @@ def delete_from_chat(chat_id, member_id, db_sess: Session):
         raise Exception("Вы пытаетесь выгнать админа, то есть, скорее всего, самого себя")
     members = chat_info.members.split()
     del members[members.index(str(member_id))]
-    chat_info.members = members
+    chat_info.members = " ".join(members)
     db_sess.commit()
 
 

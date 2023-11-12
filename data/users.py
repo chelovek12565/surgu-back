@@ -8,3 +8,4 @@ class User(SqlAlchemyBase, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, unique=True, autoincrement=True, primary_key=True)
     username = sqlalchemy.Column(sqlalchemy.String)
     token = sqlalchemy.Column(sqlalchemy.String, unique=True)
+    chats = sqlalchemy.Column(sqlalchemy.String)
