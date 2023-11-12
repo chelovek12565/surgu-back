@@ -59,6 +59,15 @@ def chat_messages(chat_id):
     return jsonify(out)
 
 
+@app.route("/chat/members/<chat_id>")
+def chat_members(chat_id):
+    db_sess = db_session.create_session()
+    chat_info = get_chatinfo_by_chatid(chat_id, db_sess)
+    members = map(int, chat_info.members.split())
+    out = [get_user_by_id(mem_id, db_sess).to_dict() for mem_id in members]
+    return jsonify(out)
+
+
 @app.route("/chat_short/<chat_id>", methods=["GET"])
 def chat_short(chat_id):
     db_sess = db_session.create_session()

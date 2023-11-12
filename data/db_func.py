@@ -64,19 +64,18 @@ def add_chat_members(db_sess: Session, members_id, chat_id):
     chat = db_sess.query(ChatInfo).where(ChatInfo.id == chat_id).first()
     members = chat.members.split()
     for mem_id in members_id:
-        if str(mem_id) not in members:
+        if mem_id not in members:
             members.append(str(mem_id))
+            user = get_user_by_id(mem_id, db_sess)
+            user.chats = " ".join(user.chats.split() + [str(chat_id)])
     chat.members = " ".join(sorted(members))
-
-    for member_id in members:
-        member_id = int(member_id)
-        user = get_user_by_id(member_id, db_sess)
-        user.chats = " ".join(user.chats.split() + str(chat_id))
     db_sess.commit()
 
 
 def add_chat_to_user(db_sess: Session, user_id, chat_id):
     user = get_user_by_id(user_id, db_sess)
+    if str(chat_id) in user.chats.split():
+        return
     user.chats = " ".join(user.chats.split() + [str(chat_id)])
     db_sess.commit()
 
