@@ -16,6 +16,18 @@ def user_pretty(user: User):
     return out
 
 
+def parse_one_task(task_id, token):
+    headers={'Authorization': 'Bearer ' + token}
+    r = requests.get(f"https://api.weeek.net/public/v1/tm/tasks/{task_id}",headers=headers)
+    task = r.json()["task"]
+    dict_out = {}
+    dict_out["title"] = task["title"]
+    dict_out["description"] = task["description"]
+    dict_out["date"] = task["date"]
+    rp = requests.get(f"https://api.weeek.net/public/v1/tm/projects/{task['projectId']}", headers=headers)
+    dict_out["project_name"] = rp.json()["project"]["name"]
+    return dict_out
+
 def parse_card(token):
     headers={'Authorization': 'Bearer ' + token}
     r = requests.get("https://api.weeek.net/public/v1/tm/tasks",headers=headers)

@@ -20,6 +20,26 @@ def parse_task():
     return jsonify(parse_card(token))
 
 
+@app.route("/send_task")
+def send_task():
+    db_sess = db_session.create_session()
+
+    token = request.json["token"]
+    user = get_user_by_token(token, db_sess)
+    task_id = request.json["task_id"]
+    chat_id = request.json["chat_id"]
+    task = parse_one_task(task_id, token)
+    out = f"Эй! Мне нужна помощь с таском {task['title']}\n" \
+    f"Проект: {task['project_name']}\n"
+    if task['description']:
+        out += f"Описание: {task['description']}\n"
+    out += f"Дата: {task['date']}"
+
+    new_message(chat_id, out, user.id, db_sess)
+
+    socketio.emit("chat", {"text": out, "username": user.username}, to=str(chat_id))
+
+
 @app.route("/invite", methods=["POST"])
 def invite():
     """
