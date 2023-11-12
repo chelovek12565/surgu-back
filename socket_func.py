@@ -48,7 +48,7 @@ def new_message(chat_id, text, user_id):
     # sids = get_sid_by_chat(chat_id, db_sess)
     # del sids[sids.index(request.sid)]
     # for sid in sids:
-    emit("chat", {"text": text, "username": get_username_by_id(user_id, db_sess=db_sess)}, to=str(chat_id))
+    emit("chat", {"text": text, "username": get_username_by_id(user_id, db_sess=db_sess), "user_id": user_id}, to=str(chat_id))
 
 
 

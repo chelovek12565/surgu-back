@@ -126,7 +126,7 @@ def chat_short(chat_id):
     return jsonify(get_chat_preview(chat_id, db_sess))
 
 
-@app.route("/last_messages", methods=["GET"])
+@app.route("/last_messages", methods=["POST"])
 def last_messages():
     """
     index - отсчет с нуля
