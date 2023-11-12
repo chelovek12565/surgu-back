@@ -45,6 +45,13 @@ def edit_chat():
     return "ok"
 
 
+@app.route("/users_chats/<user_id>", methods=["GET"])
+def users_chats(user_id):
+    db_sess = db_session.create_session()
+    user = get_user_by_id(user_id, db_sess)
+    out = [get_chat_preview(chat_id, db_sess) for chat_id in map(int, user.chats.split())]
+    return jsonify(out)
+
 
 @app.route("/delete_from_chat", methods=["DELETE"])
 def api_delete_from_chat():
@@ -89,17 +96,7 @@ def chat_members(chat_id):
 @app.route("/chat_short/<chat_id>", methods=["GET"])
 def chat_short(chat_id):
     db_sess = db_session.create_session()
-    last_message = get_last_message(chat_id, db_sess)
-    user_id = last_message[2]
-    user = get_user_by_id(user_id, db_sess)
-    chat_info = get_chatinfo_by_chatid(chat_id, db_sess)
-    return jsonify({
-        "latest_message": {
-            "username": user.username,
-            "text": last_message[1]
-        },
-        "name": chat_info.name
-    })
+    return jsonify(get_chat_preview(chat_id, db_sess))
 
 
 @app.route("/last_messages", methods=["GET"])

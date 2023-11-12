@@ -5,6 +5,7 @@ from sqlalchemy.schema import CreateTable, DropTable, MetaData, Table
 from sqlalchemy import Column
 from sqlalchemy import String, Integer, Float, BigInteger, DateTime
 import datetime
+from flask import jsonify
 import requests
 
 
@@ -32,6 +33,22 @@ def new_user(db_sess: Session, token):
     user.chats = ""
     user.username = " ".join(name)
     db_sess.add(user)
+
+
+def get_chat_preview(chat_id, db_sess: Session):
+    out = {}
+    last_message = get_last_message(chat_id, db_sess)
+    if not last_message:
+        out["latest_message"] = None
+    else:
+        user_id = last_message[2]
+        user = get_user_by_id(user_id, db_sess)
+        out["latest_message"] = {"username": user.username, "text": last_message[1]}
+    chat_info = get_chatinfo_by_chatid(chat_id, db_sess)
+    return {
+        "latest_message": out["latest_message"],
+        "name": chat_info.name
+    }
 
 
 def get_sid_by_chat(chat_id, db_sess: Session):
