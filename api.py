@@ -14,6 +14,12 @@ socketio.init_app(app, cors_allowed_origins="*")
 db_session.global_init("./data/main.db")
 
 
+@app.route("/parse_task")
+def parse_task():
+    token = request.json["token"]
+    return jsonify(parse_card(token))
+
+
 @app.route("/invite", methods=["POST"])
 def invite():
     """

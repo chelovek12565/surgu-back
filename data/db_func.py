@@ -16,6 +16,20 @@ def user_pretty(user: User):
     return out
 
 
+def parse_card(token):
+    headers={'Authorization': 'Bearer ' + token}
+    r = requests.get("https://api.weeek.net/public/v1/tm/tasks",headers=headers)
+    out = []
+    for task in r.json()["tasks"]:
+        dict_out = {}
+        dict_out["title"] = task["title"]
+        dict_out["description"] = task["description"]
+        dict_out["date"] = task["date"]
+        rp = requests.get(f"https://api.weeek.net/public/v1/tm/projects/{task['projectId']}", headers=headers)
+        dict_out["project_name"] = rp.json()["project"]["name"]
+        out.append(dict_out)
+    return out
+
 def new_user(db_sess: Session, token):
     user = User()
     r = requests.get("https://api.weeek.net/public/v1/user/me",
