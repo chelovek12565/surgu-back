@@ -184,4 +184,4 @@ def add_chat():
 
 
 # app.run(port=123)
-socketio.run(app, port=5000, allow_unsafe_werkzeug=True)
+socketio.run(app, port=6000, allow_unsafe_werkzeug=True)
