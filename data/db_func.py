@@ -61,7 +61,8 @@ def get_chat_preview(chat_id, db_sess: Session):
     chat_info = get_chatinfo_by_chatid(chat_id, db_sess)
     return {
         "latest_message": out["latest_message"],
-        "name": chat_info.name
+        "name": chat_info.name,
+        "id": chat_id
     }
 
 
