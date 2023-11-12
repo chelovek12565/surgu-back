@@ -36,8 +36,9 @@ def send_task():
     out += f"Дата: {task['date']}"
 
     new_message(chat_id, out, user.id, db_sess)
-
+    db_sess.commit()
     socketio.emit("chat", {"text": out, "username": user.username}, to=str(chat_id))
+    return "ok"
 
 
 @app.route("/invite", methods=["POST"])
