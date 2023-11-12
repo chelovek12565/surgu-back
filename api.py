@@ -41,7 +41,7 @@ def edit_chat():
         chat_info.name = new_name
         db_sess.commit()
     else:
-        raise Exception("trying to change name as non-admin user")
+        return "trying to change name as non-admin user"
     return "ok"
 
 
